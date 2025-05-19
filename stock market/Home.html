@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeSmart AI - Next-Gen Stock Market Insights</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0/dist/chartjs-adapter-luxon.min.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #e11d48;
+            --success: #22c55e;
+            --india-orange: #ff6200;
+            --india-green: #15803d;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            scroll-behavior: smooth;
+        }
+        .gradient-bg {
+            background: linear-gradient(-45deg, #1e3a8a, #3b82f6, #ec4899, #ef4444);
+            background-size: 400% 400%;
+            animation: gradient 12s ease infinite;
+        }
+        .india-gradient {
+            background: linear-gradient(-45deg, #ff6200, #ffffff, #15803d);
+            background-size: 400% 400%;
+            animation: gradient 12s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--secondary);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            color: white;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            transition: transform 0.3s ease;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="Home.html" onclick="showPage('home-page')" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-red-600">TradeSmart AI</a>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="Home.html" onclick="showPage('home-page')" class="nav-link font-medium">Home</a>
+                <a href="Stocks.html" onclick="showPage('stocks-page')" class="nav-link font-medium">Stocks</a>
+                <a href="News.html" onclick="showPage('news-page')" class="nav-link font-medium">News</a>
+                <a href="Portfolio.html" onclick="showPage('portfolio-page')" class="nav-link font-medium">Portfolio</a>
+                <a href="Ipo.html" onclick="showPage('ipo-page')" class="nav-link font-medium">IPOs</a>
+                <a href="about_contact.html" onclick="showPage('about-page')" class="nav-link font-medium">About</a>
+            </div>
+            <div class="flex items-center">
+                <div id="guest-nav" class="hidden md:flex space-x-4">
+                    <a href="login.html" onclick="showPage('login-page')" class="px-4 py-2 rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-50">Login</a>
+                    <a href="registration.html" onclick="showPage('signup-page')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Sign Up</a>
+                </div>
+                <div id="user-nav" class="hidden md:flex items-center space-x-6">
+                    <div class="relative cursor-pointer">
+                        <i class="fas fa-bell text-gray-600 text-lg"></i>
+                        <span class="notification-badge">2</span>
+                    </div>
+                    <div class="flex items-center space-x-2 cursor-pointer" onclick="toggleUserMenu()">
+                        <div class="user-avatar">AP</div>
+                        <span class="font-medium">Amit Patel</span>
+                        <i class="fas fa-chevron-down text-xs text-gray-500"></i>
+                    </div>
+                </div>
+                <div class="md:hidden ml-4">
+                    <button id="menu-toggle" class="focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section id="home-page" class="page-section active">
+        <section class="gradient-bg py-16 text-white">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col-reverse lg:flex-row items-center">
+                    <div class="lg:w-1/2 mt-8 lg:mt-0">
+                        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+                            Master the Market with <span class="text-yellow-300">AI-Powered Insights</span>
+                        </h1>
+                        <p class="mt-4 text-lg md:text-xl font-light">
+                            Leverage cutting-edge AI to predict stock trends and optimize your investments.
+                        </p>
+                        <div class="mt-4 mb-4">
+                            <div class="inline-flex items-center bg-white bg-opacity-20 px-4 py-2 rounded-lg">
+                                <div class="live-dot mr-2"></div>
+                                <span class="text-white font-medium">Real-time Indian market updates</span>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex flex-wrap gap-4">
+                            <a href="chart.html" onclick="showPage('prediction-page')" class="px-6 py-3 bg-white text-blue-800 font-semibold rounded-lg shadow-lg hover-lift">Start Predicting</a>
+                            <a href="Portfolio.html" onclick="showPage('portfolio-page')" class="px-6 py-3 border-2 border-white text-white font-semibold rounded-lg hover-lift">Build Portfolio</a>
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2 flex justify-center lg:justify-end">
+                        <div class="glass p-4 rounded-lg">
+                            <canvas id="hero-chart" width="400" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="flex items-center justify-center mb-10">
+                    <h2 class="text-2xl md:text-3xl font-bold text-center">
+                        Indian <span class="text-blue-600">Market </span>
+                    </h2>
+                    <div class="market-timer open ml-4 flex items-center">
+                        <div class="live-dot mr-2"></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-gray-800">NIFTY 50</h3>
+                                <p class="text-sm text-gray-500">National Stock Exchange</p>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="live-dot mr-2"></div>
+                                <span class="text-xs font-medium text-green-600">LIVE</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <h4 class="text-2xl font-bold text-gray-900">22,150.25</h4>
+                                <div class="flex items-center mt-1">
+                                    <i class="fas fa-arrow-up text-green-600 mr-1"></i>
+                                    <span class="font-semibold text-green-600">+120.80 (+0.55%)</span>
+                                </div>
+                            </div>
+                            <div class="h-14 w-20">
+                                <canvas id="nifty-spark"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-gray-800">SENSEX</h3>
+                                <p class="text-sm text-gray-500">Bombay Stock Exchange</p>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="live-dot mr-2"></div>
+                                <span class="text-xs font-medium text-green-600">LIVE</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <h4 class="text-2xl font-bold text-gray-900">73,020.40</h4>
+                                <div class="flex items-center mt-1">
+                                    <i class="fas fa-arrow-up text-green-600 mr-1"></i>
+                                    <span class="font-semibold text-green-600">+380.25 (+0.52%)</span>
+                                </div>
+                            </div>
+                            <div class="h-14 w-20">
+                                <canvas id="sensex-spark"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-gray-800">BANK NIFTY</h3>
+                                <p class="text-sm text-gray-500">Banking Index</p>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="live-dot mr-2"></div>
+                                <span class="text-xs font-medium text-green-600">LIVE</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <h4 class="text-2xl font-bold text-gray-900">48,120.75</h4>
+                                <div class="flex items-center mt-1">
+                                    <i class="fas fa-arrow-up text-green-600 mr-1"></i>
+                                    <span class="font-semibold text-green-600">+290.45 (+0.61%)</span>
+                                </div>
+                            </div>
+                            <div class="h-14 w-20">
+                                <canvas id="banknifty-spark"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-12">
+                    <h3 class="text-xl font-bold mb-6">Top Performing Stocks</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white rounded-lg shadow-md">
+                            <thead class="bg-gray-100 text-gray-700">
+                                <tr>
+                                    <th class="py-3 px-4 text-left">Symbol</th>
+                                    <th class="py-3 px-4 text-left">Company</th>
+                                    <th class="py-3 px-4 text-right">Price (₹)</th>
+                                    <th class="py-3 px-4 text-right">Change</th>
+                                    <th class="py-3 px-4 text-right">Market Cap (Cr)</th>
+                                    <th class="py-3 px-4 text-center">Predict</th>
+                                    <th class="py-3 px-4 text-center">Add</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium"><a href="Stocks.html" onclick="showSingleStock('RELIANCE')" class="text-blue-600 hover:underline">RELIANCE</a></td>
+                                    <td class="py-3 px-4">Reliance Industries Ltd.</td>
+                                    <td class="py-3 px-4 text-right">2,950.20</td>
+                                    <td class="py-3 px-4 text-right text-green-600">+30.75 (+1.05%)</td>
+                                    <td class="py-3 px-4 text-right">19,95,200</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700" onclick="predictStock('RELIANCE')">
+                                            <i class="fas fa-chart-line mr-1"></i> Predict
+                                        </button>
+                                    </td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700" onclick="addToPortfolio('RELIANCE')">
+                                            <i class="fas fa-plus mr-1"></i> Add
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium"><a href="Stocks.html" onclick="showSingleStock('TCS')" class="text-blue-600 hover:underline">TCS</a></td>
+                                    <td class="py-3 px-4">Tata Consultancy Services</td>
+                                    <td class="py-3 px-4 text-right">3,740.50</td>
+                                    <td class="py-3 px-4 text-right text-green-600">+50.30 (+1.36%)</td>
+                                    <td class="py-3 px-4 text-right">13,65,400</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700" onclick="predictStock('TCS')">
+                                            <i class="fas fa-chart-line mr-1"></i> Predict
+                                        </button>
+                                    </td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700" onclick="addToPortfolio('TCS')">
+                                            <i class="fas fa-plus mr-1"></i> Add
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium"><a href="Stocks.html" onclick="showSingleStock('INFY')" class="text-blue-600 hover:underline">INFY</a></td>
+                                    <td class="py-3 px-4">Infosys Ltd.</td>
+                                    <td class="py-3 px-4 text-right">1,530.80</td>
+                                    <td class="py-3 px-4 text-right text-green-600">+20.10 (+1.33%)</td>
+                                    <td class="py-3 px-4 text-right">6,35,100</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700" onclick="predictStock('INFY')">
+                                            <i class="fas fa-chart-line mr-1"></i> Predict
+                                        </button>
+                                    </td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button
+
+ class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700" onclick="addToPortfolio('INFY')">
+                                            <i class="fas fa-plus mr-1"></i> Add
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-6 text-center">
+                        <a href="Stocks.html" onclick="showPage('stocks-page')" class="inline-flex items-center px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 hover-lift">
+                            <i class="fas fa-search mr-2"></i> Explore All Stocks
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-2xl md:text-3xl font-bold text-center mb-12">
+                    Why Choose <span class="text-blue-600">TradeSmart AI</span>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-lg p-6 shadow-md hover-lift">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4">
+                            <i class="fas fa-robot text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">AI-Driven Predictions</h3>
+                        <p class="text-gray-600">Utilize advanced ML models like LSTM and Prophet for precise stock price forecasts.</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-6 shadow-md hover-lift">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4">
+                            <i class="fas fa-chart-bar text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Market Analytics</h3>
+                        <p class="text-gray-600">Access RSI, MACD, and 25+ technical indicators to refine your trading strategy.</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-6 shadow-md hover-lift">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4">
+                            <i class="fas fa-globe text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Real-Time Data</h3>
+                        <p class="text-gray-600">Live updates from NSE, BSE, and global markets for timely decisions.</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-6 shadow-md hover-lift">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4">
+                            <i class="fas fa-wallet text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Portfolio Tracking</h3>
+                        <p class="text-gray-600">Monitor performance, allocate assets, and get personalized AI recommendations.</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-6 shadow-md hover-lift">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4">
+                            <i class="fas fa-comment text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Sentiment Insights</h3>
+                        <p class="text-gray-600">Analyze news and social media to gauge market sentiment and trends.</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-6 shadow-md hover-lift">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4">
+                            <i class="fas fa-sliders-h text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Customizable Tools</h3>
+                        <p class="text-gray-600">Adjust prediction parameters to align with your unique trading goals.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-12 bg-blue-900 text-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">Take Control of Your Investments</h2>
+                <p class="text-lg mb-8 max-w-2xl mx-auto">
+                    Empower your trading with AI-driven insights and real-time market data.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="Prediction.html" onclick="showPage('prediction-page')" class="px-6 py-3 bg-white text-blue-900 font-semibold rounded-lg shadow-lg hover-lift">Get Started</a>
+                    <a href="Portfolio.html" onclick="showPage('portfolio-page')" class="px-6 py-3 border-2 border-white text-white font-semibold rounded-lg hover-lift">View Portfolio</a>
+                </div>
+            </div>
+        </section>
+    </section>
+</body>
+</html>

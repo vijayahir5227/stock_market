@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeSmart AI - RELIANCE Stock Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0/dist/chartjs-adapter-luxon.min.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #e11d48;
+            --success: #22c55e;
+            --india-orange: #ff6200;
+            --india-green: #15803d;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            scroll-behavior: smooth;
+        }
+        .gradient-bg {
+            background: linear-gradient(-45deg, #1e3a8a, #3b82f6, #ec4899, #ef4444);
+            background-size: 400% 400%;
+            animation: gradient 12s ease infinite;
+        }
+        .india-gradient {
+            background: linear-gradient(-45deg, #ff6200, #ffffff, #15803d);
+            background-size: 400% 400%;
+            animation: gradient 12s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--secondary);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            color: white;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            transition: transform 0.3s ease;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="#" onclick="showPage('home-page')" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-red-600">TradeSmart AI</a>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="Home.html" onclick="showPage('home-page')" class="nav-link font-medium">Home</a>
+                <a href="Stocks.html" onclick="showPage('stocks-page')" class="nav-link font-medium text-blue-600">Stocks</a>
+                <a href="News.html" onclick="showPage('news-page')" class="nav-link font-medium">News</a>
+                <a href="Portfolio.html" onclick="showPage('portfolio-page')" class="nav-link font-medium">Portfolio</a>
+                <a href="Ipo.html" onclick="showPage('ipo-page')" class="nav-link font-medium">IPOs</a>
+                <a href="about_contact.html" onclick="showPage('about-page')" class="nav-link font-medium">About</a>
+            </div>
+            <div class="flex items-center">
+                <div id="guest-nav" class="hidden md:flex space-x-4">
+                    <a href="login.html" onclick="showPage('login-page')" class="px-4 py-2 rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-50">Login</a>
+                    <a href="registration.html" onclick="showPage('signup-page')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Sign Up</a>
+                </div>
+                <div id="user-nav" class="hidden md:flex items-center space-x-6">
+                    <div class="relative cursor-pointer">
+                        <i class="fas fa-bell text-gray-600 text-lg"></i>
+                        <span class="notification-badge">2</span>
+                    </div>
+                    <div class="flex items-center space-x-2 cursor-pointer" onclick="toggleUserMenu()">
+                        <div class="user-avatar">AP</div>
+                        <span class="font-medium">Amit Patel</span>
+                        <i class="fas fa-chevron-down text-xs text-gray-500"></i>
+                    </div>
+                </div>
+                <div class="md:hidden ml-4">
+                    <button id="menu-toggle" class="focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section id="stock-detail-page" class="page-section active">
+        <section class="gradient-bg py-16 text-white">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-bold">RELIANCE</h1>
+                        <p class="text-lg">Reliance Industries Ltd.</p>
+                        <div class="flex items-center mt-4">
+                            <div class="live-dot mr-2"></div>
+                            <span class="text-sm font-medium">Market Open</span>
+                        </div>
+                        <div class="mt-4 flex items-center space-x-6">
+                            <div>
+                                <span class="text-2xl font-bold" id="current-price">₹2,950.20</span>
+                                <span class="ml-4 text-lg" id="price-change" class="text-green-400">+30.75 (+1.05%)</span>
+                            </div>
+                            <div class="flex space-x-4">
+                                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover-lift" onclick="predictStock('RELIANCE')">
+                                    <i class="fas fa-chart-line mr-2"></i> Predict
+                                </button>
+                                <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 hover-lift" onclick="addToPortfolio('RELIANCE')">
+                                    <i class="fas fa-plus mr-2"><a href="Portfolio.html" onclick="showPage('ipo-page')" class="nav-link font-medium">Add to Portfolio</a></i> 
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 md:mt-0 glass p-4 rounded-lg">
+                        <canvas id="price-chart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-2xl font-bold mb-8">Key Metrics</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
+                        <h3 class="text-lg font-semibold text-gray-700">Open</h3>
+                        <p class="text-2xl font-bold" id="open-price">₹2,920.00</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
+                        <h3 class="text-lg font-semibold text-gray-700">Close</h3>
+                        <p class="text-2xl font-bold" id="close-price">₹2,919.45</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
+                        <h3 class="text-lg font-semibold text-gray-700">High</h3>
+                        <p class="text-2xl font-bold" id="high-price">₹2,960.50</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
+                        <h3 class="text-lg font-semibold text-gray-700">Low</h3>
+                        <p class="text-2xl font-bold" id="low-price">₹2,910.30</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
+                        <h3 class="text-lg font-semibold text-gray-700">Volume</h3>
+                        <p class="text-2xl font-bold" id="volume">5,230,450</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
+                        <h3 class="text-lg font-semibold text-gray-700">Market Cap</h3>
+                        <p class="text-2xl font-bold" id="market-cap">₹19,95,200 Cr</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
+                        <h3 class="text-lg font-semibold text-gray-700">P/E Ratio</h3>
+                        <p class="text-2xl font-bold">28.45</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
+                        <h3 class="text-lg font-semibold text-gray-700">52-Week Range</h3>
+                        <p class="text-2xl font-bold">₹2,500.00 - ₹3,050.00</p>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold mb-8">AI Prediction</h2>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2">
+                            <h3 class="text-lg font-semibold text-gray-700">Price Forecast</h3>
+                            <p class="text-gray-600 mt-2">
+                                Our AI model predicts a <span class="font-bold text-green-600">bullish trend</span> for RELIANCE over the next 30 days, with an estimated price target of <span class="font-bold">₹3,050.00</span>.
+                            </p>
+                            <p class="text-gray-600 mt-2">
+                                Confidence Score: <span class="font-bold text-blue-600">85%</span>
+                            </p>
+                            <p class="text-gray-600 mt-2">
+                                Based on LSTM and sentiment analysis of recent market news and social media trends.
+                            </p>
+                            <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover-lift" onclick="predictStock('RELIANCE')">
+                                <i class="fas fa-brain mr-2"></i> Run New Prediction
+                            </button>
+                        </div>
+                        <div class="md:w-1/2 mt-6 md:mt-0">
+                            <canvas id="prediction-chart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <script>
+        // Placeholder for page navigation
+        function showPage(pageId) {
+            console.log(`Navigate to ${pageId}`);
+        }
+
+        // Placeholder for stock prediction
+        function predictStock(symbol) {
+            console.log(`Predicting stock: ${symbol}`);
+        }
+
+        // Placeholder for adding to portfolio
+        function addToPortfolio(symbol) {
+            console.log(`Adding ${symbol} to portfolio`);
+        }
+
+        // Placeholder for user menu toggle
+        function toggleUserMenu() {
+            console.log("Toggling user menu");
+        }
+
+        // Simulate real-time price updates
+        let currentPrice = 2950.20;
+        let change = 30.75;
+        let changePercent = 1.05;
+
+        function updatePrice() {
+            const fluctuation = (Math.random() * 2 - 1) * 10; // Random change between -10 and +10
+            currentPrice += fluctuation;
+            change = fluctuation;
+            changePercent = (fluctuation / (currentPrice - fluctuation)) * 100;
+
+            const priceElement = document.getElementById('current-price');
+            const changeElement = document.getElementById('price-change');
+            priceElement.textContent = `₹${currentPrice.toFixed(2)}`;
+            changeElement.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)} (${changePercent.toFixed(2)}%)`;
+            changeElement.className = change >= 0 ? 'text-green-400' : 'text-red-400';
+
+            setTimeout(updatePrice, 5000); // Update every 5 seconds
+        }
+
+        updatePrice();
+
+        // Historical and predicted price chart
+        const priceCtx = document.getElementById('price-chart').getContext('2d');
+        new Chart(priceCtx, {
+            type: 'line',
+            data: {
+                labels: ['2025-04-01', '2025-04-08', '2025-04-15', '2025-04-22', '2025-04-29', '2025-05-06'],
+                datasets: [
+                    {
+                        label: 'Historical Price',
+                        data: [2900, 2920, 2890, 2940, 2950, 2950.20],
+                        borderColor: '#ffffff',
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        fill: true,
+                        pointRadius: 0,
+                    },
+                    {
+                        label: 'Predicted Price',
+                        data: [null, null, null, null, 2950.20, 3050],
+                        borderColor: '#22c55e',
+                        borderDash: [5, 5],
+                        fill: false,
+                        pointRadius: 0,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: { unit: 'day' },
+                        display: true,
+                        title: { display: true, text: 'Date' }
+                    },
+                    y: {
+                        display: true,
+                        title: { display: true, text: 'Price (₹)' }
+                    }
+                },
+                plugins: { legend: { display: true } }
+            }
+        });
+
+        // Prediction chart (simplified)
+        const predictionCtx = document.getElementById('prediction-chart').getContext('2d');
+        new Chart(predictionCtx, {
+            type: 'line',
+            data: {
+                labels: ['2025-05-06', '2025-05-13', '2025-05-20', '2025-05-27'],
+                datasets: [{
+                    label: 'Predicted Price',
+                    data: [2950.20, 2980, 3020, 3050],
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                    fill: true,
+                    pointRadius: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: { unit: 'day' },
+                        display: true,
+                        title: { display: true, text: 'Date' }
+                    },
+                    y: {
+                        display: true,
+                        title: { display: true, text: 'Price (₹)' }
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    </script>
+</body>
+</html>

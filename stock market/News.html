@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeSmart AI - Financial News</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #e11d48;
+            --success: #22c55e;
+            --india-orange: #ff6200;
+            --india-green: #15803d;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            scroll-behavior: smooth;
+        }
+        .gradient-bg {
+            background: linear-gradient(-45deg, #1e3a8a, #3b82f6, #ec4899, #ef4444);
+            background-size: 400% 400%;
+            animation: gradient 12s ease infinite;
+        }
+        .india-gradient {
+            background: linear-gradient(-45deg, #ff6200, #ffffff, #15803d);
+            background-size: 400% 400%;
+            animation: gradient 12s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% Wee50%; }
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--secondary);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            color: white;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            transition: transform 0.3s ease;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .input-focus:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="Home.html" onclick="showPage('home-page')" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-red-600">TradeSmart AI</a>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="Home.html" onclick="showPage('home-page')" class="nav-link font-medium">Home</a>
+                <a href="Stocks.html" onclick="showPage('stocks-page')" class="nav-link font-medium">Stocks</a>
+                <a href="News.html" onclick="showPage('news-page')" class="nav-link font-medium text-blue-600">News</a>
+                <a href="Portfolio.html" onclick="showPage('portfolio-page')" class="nav-link font-medium">Portfolio</a>
+                <a href="Ipo.html" onclick="showPage('ipo-page')" class="nav-link font-medium">IPOs</a>
+                <a href="about_contact.html" onclick="showPage('about-page')" class="nav-link font-medium">About</a>
+            </div>
+            <div class="flex items-center">
+                <div id="guest-nav" class="hidden md:flex space-x-4">
+                    <a href="login.html" onclick="showPage('login-page')" class="px-4 py-2 rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-50">Login</a>
+                    <a href="registration.html" onclick="showPage('signup-page')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Sign Up</a>
+                </div>
+                <div id="user-nav" class="hidden md:flex items-center space-x-6">
+                    <div class="relative cursor-pointer">
+                        <i class="fas fa-bell text-gray-600 text-lg"></i>
+                        <span class="notification-badge">2</span>
+                    </div>
+                    <div class="flex items-center space-x-2 cursor-pointer" onclick="toggleUserMenu()">
+                        <div class="user-avatar">AP</div>
+                        <span class="font-medium">Amit Patel</span>
+                        <i class="fas fa-chevron-down text-xs text-gray-500"></i>
+                    </div>
+                </div>
+                <div class="md:hidden ml-4">
+                    <button id="menu-toggle" class="focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section id="news-page" class="page-section active">
+        <section class="gradient-bg py-16 text-white">
+            <div class="container mx-auto px-6">
+                <h1 class="text-3xl md:text-4xl font-bold mb-4">Financial News</h1>
+                <p class="text-lg mb-6">Stay updated with the latest market trends and insights from Indian and global markets.</p>
+                <div class="glass p-6 rounded-lg hover-lift">
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/3">
+                            <img src="https://via.placeholder.com/300x200" alt="Featured News" class="w-full h-48 object-cover rounded-lg">
+                        </div>
+                        <div class="md:w-2/3 md:pl-6 mt-4 md:mt-0">
+                            <h2 class="text-2xl font-bold">NIFTY 50 Hits Record High Amid Tech Rally</h2>
+                            <p class="text-gray-200 mt-2">The NIFTY 50 index surged to a new all-time high, driven by strong performances in IT and banking stocks...</p>
+                            <div class="flex items-center mt-4">
+                                <span class="text-sm font-medium text-gray-300">Economic Times</span>
+                                <span class="mx-2 text-gray-400">•</span>
+                                <span class="text-sm text-gray-300">May 12, 2025</span>
+                            </div>
+                            <a href="#" class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover-lift">
+                                <i class="fas fa-newspaper mr-2"></i> Read More
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold">Latest News</h2>
+                    <div class="mt-4 md:mt-0 flex flex-col sm:flex-row gap-4">
+                        <input type="text" id="news-search" placeholder="Search news..." class="px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                        <select id="category-filter" class="px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                            <option value="all">All Categories</option>
+                            <option value="market">Market</option>
+                            <option value="stocks">Stocks</option>
+                            <option value="economy">Economy</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="news-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- News articles will be populated dynamically -->
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <script>
+        // Placeholder for page navigation
+        function showPage(pageId) {
+            console.log(`Navigate to ${pageId}`);
+        }
+
+        // Placeholder for user menu toggle
+        function toggleUserMenu() {
+            console.log("Toggling user menu");
+        }
+
+        // Sample news data
+        const newsArticles = [
+            {
+                id: 1,
+                title: "Reliance Industries Plans Major Expansion in Renewable Energy",
+                summary: "Reliance Industries announced a $10 billion investment in solar and wind energy projects, aiming to lead India's green energy transition.",
+                source: "Business Standard",
+                date: "May 10, 2025",
+                category: "stocks",
+                image: "https://via.placeholder.com/300x200"
+            },
+            {
+                id: 2,
+                title: "RBI Holds Interest Rates Steady Amid Inflation Concerns",
+                summary: "The Reserve Bank of India maintained its key policy rate at 6.5%, citing persistent inflationary pressures in food and fuel.",
+                source: "Mint",
+                date: "May 9, 2025",
+                category: "economy",
+                image: null
+            },
+            {
+                id: 3,
+                title: "Sensex Surges 500 Points on Positive Global Cues",
+                summary: "The BSE Sensex climbed over 500 points in early trade, buoyed by strong performances in Asian markets and FII inflows.",
+                source: "Financial Express",
+                date: "May 8, 2025",
+                category: "market",
+                image: "https://via.placeholder.com/300x200"
+            },
+            {
+                id: 4,
+                title: "TCS Reports Strong Q1 Earnings, Boosts IT Sector",
+                summary: "Tata Consultancy Services posted a 15% rise in net profit for Q1, driving optimism in the Indian IT sector.",
+                source: "The Hindu",
+                date: "May 7, 2025",
+                category: "stocks",
+                image: null
+            },
+            {
+                id: 5,
+                title: "Global Oil Prices Drop, Impacting Energy Stocks",
+                summary: "A surprise increase in US oil inventories led to a 3% decline in crude prices, affecting Indian energy companies.",
+                source: "Bloomberg",
+                date: "May 6, 2025",
+                category: "market",
+                image: "https://via.placeholder.com/300x200"
+            },
+            {
+                id: 6,
+                title: "Government Announces New Tax Incentives for Startups",
+                summary: "The Indian government unveiled tax breaks and funding support for startups to boost innovation and entrepreneurship.",
+                source: "Economic Times",
+                date: "May 5, 2025",
+                category: "economy",
+                image: null
+            }
+        ];
+
+        // Render news articles
+        function renderNewsArticles(articles) {
+            const grid = document.getElementById('news-grid');
+            grid.innerHTML = '';
+            articles.forEach(article => {
+                const articleCard = `
+                    <div class="bg-white rounded-lg shadow-md p-6 hover-lift">
+                        ${article.image ? `<img src="${article.image}" alt="${article.title}" class="w-full h-40 object-cover rounded-lg mb-4">` : ''}
+                        <h3 class="text-lg font-semibold text-gray-800">${article.title}</h3>
+                        <p class="text-gray-600 mt-2">${article.summary}</p>
+                        <div class="flex items-center mt-4">
+                            <span class="text-sm font-medium text-gray-500">${article.source}</span>
+                            <span class="mx-2 text-gray-400">•</span>
+                            <span class="text-sm text-gray-500">${article.date}</span>
+                        </div>
+                        <a href="#" class="mt-4 inline-block text-blue-600 hover:underline">
+                            <i class="fas fa-newspaper mr-2"></i> Read More
+                        </a>
+                    </div>
+                `;
+                grid.innerHTML += articleCard;
+            });
+        }
+
+        // Filter news articles
+        function filterNewsArticles() {
+            const search = document.getElementById('news-search').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            let filteredArticles = newsArticles.filter(article => 
+                (article.title.toLowerCase().includes(search) || 
+                 article.summary.toLowerCase().includes(search) || 
+                 article.source.toLowerCase().includes(search)) &&
+                (category === 'all' || article.category === category)
+            );
+            renderNewsArticles(filteredArticles);
+        }
+
+        // Event listeners for filtering
+        document.getElementById('news-search').addEventListener('input', filterNewsArticles);
+        document.getElementById('category-filter').addEventListener('change', filterNewsArticles);
+
+        // Initial render
+        renderNewsArticles(newsArticles);
+    </script>
+</body>
+</html>

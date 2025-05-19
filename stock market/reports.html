@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeSmart AI - Monthly/Weekly Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0/dist/chartjs-adapter-luxon.min.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #e11d48;
+            --success: #22c55e;
+            --india-orange: #ff6200;
+            --india-green: #15803d;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            scroll-behavior: smooth;
+        }
+        .gradient-bg {
+            background: linear-gradient(-45deg, #1e3a8a, #3b82f6, #ec4899, #ef4444);
+            background-size: 400% 400%;
+            animation: gradient 12s ease infinite;
+        }
+        .india-gradient {
+            background: linear-gradient(-45deg, #ff6200, #ffffff, #15803d);
+            background-size: 400% 400%;
+            animation: gradient 12s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--secondary);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            color: white;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            transition: transform 0.3s ease;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .input-focus:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="Home.html" onclick="showPage('home-page')" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-red-600">TradeSmart AI</a>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="Home.html" onclick="showPage('home-page')" class="nav-link font-medium">Home</a>
+                <a href="Stocks.html" onclick="showPage('stocks-page')" class="nav-link font-medium">Stocks</a>
+                <a href="News.html" onclick="showPage('news-page')" class="nav-link font-medium">News</a>
+                <a href="Portfolio.html" onclick="showPage('portfolio-page')" class="nav-link font-medium text-blue-600">Portfolio</a>
+                <a href="Ipo.html" onclick="showPage('ipo-page')" class="nav-link font-medium">IPOs</a>
+                <a href="about_contact.html" onclick="showPage('about-page')" class="nav-link font-medium">About</a>
+            </div>
+            <div class="flex items-center">
+                <div id="guest-nav" class="hidden md:flex space-x-4">
+                    <a href="login.html" onclick="showPage('login-page')" class="px-4 py-2 rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-50">Login</a>
+                    <a href="registration.html" onclick="showPage('signup-page')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Sign Up</a>
+                </div>
+                <div id="user-nav" class="flex md:flex items-center space-x-6">
+                    <div class="relative cursor-pointer">
+                        <i class="fas fa-bell text-gray-600 text-lg"></i>
+                        <span class="notification-badge">2</span>
+                    </div>
+                    <div class="flex items-center space-x-2 cursor-pointer" onclick="toggleUserMenu()">
+                        <div class="user-avatar">AP</div>
+                        <span class="font-medium">Amit Patel</span>
+                        <i class="fas fa-chevron-down text-xs text-gray-500"></i>
+                    </div>
+                </div>
+                <div class="md:hidden ml-4">
+                    <button id="menu-toggle" class="focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section id="reports-page" class="page-section active">
+        <section class="gradient-bg py-16 text-white">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-bold mb-4">Monthly & Weekly Reports</h1>
+                        <p class="text-lg mb-6 max-w-2xl">Analyze your trading performance with detailed reports for selected periods.</p>
+                        <div class="flex items-center">
+                            <div class="live-dot mr-2"></div>
+                            <span class="text-sm font-medium">Reports updated as of May 12, 2025</span>
+                        </div>
+                    </div>
+                    <div class="mt-8 md:mt-0 glass p-4 rounded-lg">
+                        <canvas id="pnl-chart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold">Report Controls</h2>
+                    <div class="mt-4 md:mt-0 flex gap-4">
+                        <select id="report-type" class="px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                            <option value="monthly">Monthly</option>
+                            <option value="weekly">Weekly</option>
+                        </select>
+                        <select id="report-period" class="px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                            <option value="2025-05">May 2025</option>
+                            <option value="2025-04">April 2025</option>
+                            <option value="2025-05-06">Week of May 6-12, 2025</option>
+                            <option value="2025-04-29">Week of Apr 29-May 5, 2025</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold mb-8">Performance Summary</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <div class="glass p-6 rounded-lg hover-lift">
+                        <h3 class="text-lg font-semibold text-gray-700">Total Profit/Loss</h3>
+                        <p class="text-2xl font-bold text-green-600 mt-2" id="total-pnl">+₹15,250.75</p>
+                    </div>
+                    <div class="glass p-6 rounded-lg hover-lift">
+                        <h3 class="text-lg font-semibold text-gray-700">Total Trades</h3>
+                        <p class="text-2xl font-bold text-blue-600 mt-2" id="total-trades">8</p>
+                    </div>
+                    <div class="glass p-6 rounded-lg hover-lift">
+                        <h3 class="text-lg font-semibold text-gray-700">Win Rate</h3>
+                        <p class="text-2xl font-bold text-blue-600 mt-2" id="win-rate">75.00%</p>
+                    </div>
+                    <div class="glass p-6 rounded-lg hover-lift">
+                        <h3 class="text-lg font-semibold text-gray-700">Top Stock</h3>
+                        <p class="text-2xl font-bold text-blue-600 mt-2" id="top-stock">TCS</p>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold mb-8">Trades in Period</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                        <thead class="bg-gray-100 text-gray-700">
+                            <tr>
+                                <th class="py-3 px-4 text-left">Date</th>
+                                <th class="py-3 px-4 text-left">Symbol</th>
+                                <th class="py-3 px-4 text-left">Type</th>
+                                <th class="py-3 px-4 text-right">Quantity</th>
+                                <th class="py-3 px-4 text-right">Price (₹)</th>
+                                <th class="py-3 px-4 text-right">Total Value (₹)</th>
+                                <th class="py-3 px-4 text-right">Profit/Loss (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trades-table" class="divide-y divide-gray-200">
+                            <!-- Trades will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <script>
+        // Placeholder for page navigation
+        function showPage(pageId) {
+            console.log(`Navigate to ${pageId}`);
+        }
+
+        // Placeholder for user menu toggle
+        function toggleUserMenu() {
+            console.log("Toggling user menu");
+        }
+
+        // Placeholder for viewing trade details
+        function viewTrade(id) {
+            console.log(`Viewing trade details for ID: ${id}`);
+        }
+
+        // Sample trades data
+        const trades = [
+            { id: 1, date: '2025-05-10', symbol: 'RELIANCE', type: 'Buy', quantity: 10, price: 2940.00, total: 29400.00, pnl: null, period: ['2025-05', '2025-05-06'] },
+            { id: 2, date: '2025-05-08', symbol: 'TCS', type: 'Sell', quantity: 5, price: 3750.00, total: 18750.00, pnl: 750.00, period: ['2025-05', '2025-05-06'] },
+            { id: 3, date: '2025-05-05', symbol: 'HDFCBANK', type: 'Buy', quantity: 20, price: 1650.00, total: 33000.00, pnl: null, period: ['2025-05', '2025-04-29'] },
+            { id: 4, date: '2025-05-02', symbol: 'RELIANCE', type: 'Sell', quantity: 5, price: 2960.00, total: 14800.00, pnl: 500.00, period: ['2025-05', '2025-04-29'] },
+            { id: 5, date: '2025-04-28', symbol: 'TCS', type: 'Buy', quantity: 8, price: 3600.00, total: 28800.00, pnl: null, period: ['2025-04', '2025-04-29'] },
+            { id: 6, date: '2025-04-25', symbol: 'HDFCBANK', type: 'Sell', quantity: 10, price: 1680.00, total: 16800.00, pnl: 300.00, period: ['2025-04', '2025-04-29'] },
+        ];
+
+        // Sample chart data for different periods
+        const chartData = {
+            '2025-05': {
+                labels: ['2025-05-01', '2025-05-04', '2025-05-07', '2025-05-10'],
+                data: [0, 500, 1250, 15250.75],
+            },
+            '2025-04': {
+                labels: ['2025-04-01', '2025-04-10', '2025-04-20', '2025-04-30'],
+                data: [0, 200, 300, 300],
+            },
+            '2025-05-06': {
+                labels: ['2025-05-06', '2025-05-07', '2025-05-08', '2025-05-09', '2025-05-10'],
+                data: [0, 500, 1250, 1250, 15250.75],
+            },
+            '2025-04-29': {
+                labels: ['2025-04-29', '2025-04-30', '2025-05-01', '2025-05-02', '2025-05-03'],
+                data: [0, 0, 500, 1000, 1000],
+            },
+        };
+
+        // Render trades table
+        function renderTradesTable(data) {
+            const tbody = document.getElementById('trades-table');
+            tbody.innerHTML = '';
+            data.forEach(trade => {
+                const pnlClass = trade.pnl === null ? 'text-gray-500' : trade.pnl >= 0 ? 'text-green-600' : 'text-red-600';
+                const row = `
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-3 px-4">${trade.date}</td>
+                        <td class="py-3 px-4">
+                            <a href="#" onclick="viewTrade(${trade.id})" class="text-blue-600 hover:underline">${trade.symbol}</a>
+                        </td>
+                        <td class="py-3 px-4 ${trade.type === 'Buy' ? 'text-green-600' : 'text-red-600'}">${trade.type}</td>
+                        <td class="py-3 px-4 text-right">${trade.quantity}</td>
+                        <td class="py-3 px-4 text-right">${trade.price.toFixed(2)}</td>
+                        <td class="py-3 px-4 text-right">${trade.total.toFixed(2)}</td>
+                        <td class="py-3 px-4 text-right ${pnlClass}">
+                            ${trade.pnl === null ? 'Open' : (trade.pnl >= 0 ? '+' : '') + trade.pnl.toFixed(2)}
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+
+            // Update summary metrics
+            const closedTrades = data.filter(t => t.pnl !== null);
+            const totalPnL = closedTrades.reduce((sum, t) => sum + t.pnl, 0);
+            const totalTrades = closedTrades.length;
+            const winRate = totalTrades > 0 ? (closedTrades.filter(t => t.pnl > 0).length / totalTrades * 100).toFixed(2) : 0;
+            const stockPnL = {};
+            closedTrades.forEach(t => {
+                stockPnL[t.symbol] = (stockPnL[t.symbol] || 0) + t.pnl;
+            });
+            const topStock = Object.keys(stockPnL).length > 0 ? Object.keys(stockPnL).reduce((a, b) => stockPnL[a] > stockPnL[b] ? a : b) : 'None';
+
+            document.getElementById('total-pnl').textContent = `${totalPnL >= 0 ? '+' : ''}₹${totalPnL.toFixed(2)}`;
+            document.getElementById('total-pnl').className = `text-2xl font-bold mt-2 ${totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`;
+            document.getElementById('total-trades').textContent = totalTrades;
+            document.getElementById('win-rate').textContent = `${winRate}%`;
+            document.getElementById('top-stock').textContent = topStock;
+        }
+
+        // Update chart
+        let chartInstance = null;
+        function updateChart(period) {
+            const data = chartData[period] || chartData['2025-05'];
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            const ctx = document.getElementById('pnl-chart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Cumulative Profit/Loss',
+                        data: data.data,
+                        borderColor: '#ffffff',
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        fill: true,
+                        pointRadius: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: { unit: period.includes('week') ? 'day' : 'day' },
+                            display: true,
+                            title: { display: true, text: 'Date' }
+                        },
+                        y: {
+                            display: true,
+                            title: { display: true, text: 'Profit/Loss (₹)' }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // Filter trades and update report
+        function updateReport() {
+            const reportType = document.getElementById('report-type').value;
+            const reportPeriod = document.getElementById('report-period').value;
+            const periodOptions = document.getElementById('report-period');
+
+            // Update period options based on report type
+            periodOptions.innerHTML = reportType === 'monthly' ?
+                `<option value="2025-05">May 2025</option><option value="2025-04">April 2025</option>` :
+                `<option value="2025-05-06">Week of May 6-12, 2025</option><option value="2025-04-29">Week of Apr 29-May 5, 2025</option>`;
+            periodOptions.value = reportPeriod in chartData ? reportPeriod : (reportType === 'monthly' ? '2025-05' : '2025-05-06');
+
+            // Filter trades by period
+            const filteredTrades = trades.filter(t => t.period.includes(periodOptions.value));
+            renderTradesTable(filteredTrades);
+            updateChart(periodOptions.value);
+        }
+
+        // Event listeners for report controls
+        document.getElementById('report-type').addEventListener('change', updateReport);
+        document.getElementById('report-period').addEventListener('change', updateReport);
+
+        // Initial render
+        updateReport();
+    </script>
+</body>
+</html>

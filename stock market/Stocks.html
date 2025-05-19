@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeSmart AI - All Stocks</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0/dist/chartjs-adapter-luxon.min.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #e11d48;
+            --success: #22c55e;
+            --india-orange: #ff6200;
+            --india-green: #15803d;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            scroll-behavior: smooth;
+        }
+        .gradient-bg {
+            background: linear-gradient(-45deg, #1e3a8a, #3b82f6, #ec4899, #ef4444);
+            background-size: 400% 400%;
+            animation: gradient 12s ease infinite;
+        }
+        .india-gradient {
+            background: linear-gradient(-45deg, #ff6200, #ffffff, #15803d);
+            background-size: 400% 400%;
+            animation: gradient 12s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--secondary);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            color: white;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            transition: transform 0.3s ease;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .input-focus:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="Home.html" onclick="showPage('home-page')" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-red-600">TradeSmart AI</a>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="Home.html" onclick="showPage('home-page')" class="nav-link font-medium">Home</a>
+                <a href="Stocks.html" onclick="showPage('stocks-page')" class="nav-link font-medium text-blue-600">Stocks</a>
+                <a href="News.html" onclick="showPage('news-page')" class="nav-link font-medium">News</a>
+                <a href="Portfolio.html" onclick="showPage('portfolio-page')" class="nav-link font-medium">Portfolio</a>
+                <a href="Ipo.html" onclick="showPage('ipo-page')" class="nav-link font-medium">IPOs</a>
+                <a href="about_contact.html" onclick="showPage('about-page')" class="nav-link font-medium">About</a>
+            </div>
+            <div class="flex items-center">
+                <div id="guest-nav" class="hidden md:flex space-x-4">
+                    <a href="login.html" onclick="showPage('login-page')" class="px-4 py-2 rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-50">Login</a>
+                    <a href="registration.html" onclick="showPage('signup-page')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Sign Up</a>
+                </div>
+                <div id="user-nav" class="hidden md:flex items-center space-x-6">
+                    <div class="relative cursor-pointer">
+                        <i class="fas fa-bell text-gray-600 text-lg"></i>
+                        <span class="notification-badge">2</span>
+                    </div>
+                    <div class="flex items-center space-x-2 cursor-pointer" onclick="toggleUserMenu()">
+                        <div class="user-avatar">AP</div>
+                        <span class="font-medium">Amit Patel</span>
+                        <i class="fas fa-chevron-down text-xs text-gray-500"></i>
+                    </div>
+                </div>
+                <div class="md:hidden ml-4">
+                    <button id="menu-toggle" class="focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section id="stocks-page" class="page-section active">
+        <section class="gradient-bg py-16 text-white">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-bold">Explore All Indian Stocks</h1>
+                        <p class="mt-4 text-lg">Real-time prices and AI-powered predictions for NSE and BSE stocks.</p>
+                        <div class="mt-4 flex items-center">
+                            <div class="live-dot mr-2"></div>
+                            <span class="text-sm font-medium">Market Open</span>
+                        </div>
+                    </div>
+                    <div class="mt-8 md:mt-0 glass p-4 rounded-lg">
+                        <canvas id="market-chart" width="300" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold">Stock List</h2>
+                    <div class="mt-4 md:mt-0 flex flex-col sm:flex-row gap-4">
+                        <input type="text" id="stock-search" placeholder="Search stocks..." class="px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                        <select id="sort-stocks" class="px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                            <option value="name-asc">Name (A-Z)</option>
+                            <option value="name-desc">Name (Z-A)</option>
+                            <option value="price-asc">Price (Low to High)</option>
+                            <option value="price-desc">Price (High to Low)</option>
+                            <option value="change-asc">Change (Low to High)</option>
+                            <option value="change-desc">Change (High to Low)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                        <thead class="bg-gray-100 text-gray-700">
+                            <tr>
+                                <th class="py-3 px-4 text-left">Symbol</th>
+                                <th class="py-3 px-4 text-left">Company</th>
+                                <th class="py-3 px-4 text-right">Price (₹)</th>
+                                <th class="py-3 px-4 text-right">Change</th>
+                                <th class="py-3 px-4 text-right">Market Cap (Cr)</th>
+                                <th class="py-3 px-4 text-center">Predict</th>
+                                <th class="py-3 px-4 text-center">Add</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-table" class="divide-y divide-gray-200">
+                            <!-- Stock rows will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <script>
+        // Placeholder for page navigation
+        function showPage(pageId) {
+            console.log(`Navigate to ${pageId}`);
+        }
+
+        // Placeholder for stock prediction
+        function predictStock(symbol) {
+            console.log(`Predicting stock: ${symbol}`);
+        }
+
+        // Placeholder for adding to portfolio
+        function addToPortfolio(symbol) {
+            console.log(`Adding ${symbol} to portfolio`);
+        }
+
+        // Placeholder for single stock view
+        function showSingleStock(symbol) {
+            console.log(`Showing details for ${symbol}`);
+        }
+
+        // Placeholder for user menu toggle
+        function toggleUserMenu() {
+            console.log("Toggling user menu");
+        }
+
+        // Sample stock data
+        const stocks = [
+            { symbol: 'RELIANCE', company: 'Reliance Industries Ltd.', price: 2950.20, change: 30.75, changePercent: 1.05, marketCap: 1995200 },
+            { symbol: 'TCS', company: 'Tata Consultancy Services', price: 3740.50, change: 50.30, changePercent: 1.36, marketCap: 1365400 },
+            { symbol: 'INFY', company: 'Infosys Ltd.', price: 1530.80, change: 20.10, changePercent: 1.33, marketCap: 635100 },
+            { symbol: 'HDFCBANK', company: 'HDFC Bank Ltd.', price: 1670.30, change: -12.40, changePercent: -0.74, marketCap: 842156 },
+            { symbol: 'BAJFINANCE', company: 'Bajaj Finance Ltd.', price: 7120.85, change: 115.20, changePercent: 1.64, marketCap: 430845 },
+            { symbol: 'SBIN', company: 'State Bank of India', price: 820.45, change: 10.25, changePercent: 1.26, marketCap: 732100 },
+            { symbol: 'HINDUNILVR', company: 'Hindustan Unilever Ltd.', price: 2520.60, change: -15.30, changePercent: -0.60, marketCap: 592300 },
+            { symbol: 'ICICIBANK', company: 'ICICI Bank Ltd.', price: 1125.70, change: 18.40, changePercent: 1.66, marketCap: 790450 },
+        ];
+
+        // Render stock table
+        function renderStockTable(data) {
+            const tbody = document.getElementById('stock-table');
+            tbody.innerHTML = '';
+            data.forEach(stock => {
+                const changeClass = stock.change >= 0 ? 'text-green-600' : 'text-red-600';
+                const arrowIcon = stock.change >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+                const row = `
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-3 px-4 font-medium">
+                            <a href="#" onclick="showSingleStock('${stock.symbol}')" class="text-blue-600 hover:underline">${stock.symbol}</a>
+                        </td>
+                        <td class="py-3 px-4">${stock.company}</td>
+                        <td class="py-3 px-4 text-right" data-price="${stock.symbol}">${stock.price.toFixed(2)}</td>
+                        <td class="py-3 px-4 text-right ${changeClass}">
+                            <i class="fas ${arrowIcon} mr-1"></i>
+                            ${stock.change.toFixed(2)} (${stock.changePercent.toFixed(2)}%)
+                        </td>
+                        <td class="py-3 px-4 text-right">${stock.marketCap.toLocaleString()}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700" onclick="predictStock('${stock.symbol}')">
+                                <i class="fas fa-chart-line mr-1"></i> Predict
+                            </button>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <button class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700" onclick="addToPortfolio('${stock.symbol}')">
+                                <i class="fas fa-plus mr-1"></i> Add
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // Filter and sort stocks
+        function filterAndSortStocks() {
+            const search = document.getElementById('stock-search').value.toLowerCase();
+            const sort = document.getElementById('sort-stocks').value;
+            let filteredStocks = stocks.filter(stock => 
+                stock.symbol.toLowerCase().includes(search) || 
+                stock.company.toLowerCase().includes(search)
+            );
+
+            filteredStocks.sort((a, b) => {
+                if (sort === 'name-asc') return a.symbol.localeCompare(b.symbol);
+                if (sort === 'name-desc') return b.symbol.localeCompare(a.symbol);
+                if (sort === 'price-asc') return a.price - b.price;
+                if (sort === 'price-desc') return b.price - a.price;
+                if (sort === 'change-asc') return a.changePercent - b.changePercent;
+                if (sort === 'change-desc') return b.changePercent - a.changePercent;
+                return 0;
+            });
+
+            renderStockTable(filteredStocks);
+        }
+
+        // Simulate real-time price updates
+        function updatePrices() {
+            stocks.forEach(stock => {
+                const fluctuation = (Math.random() * 2 - 1) * 10; // Random change between -10 and +10
+                stock.price += fluctuation;
+                stock.change = fluctuation;
+                stock.changePercent = (fluctuation / (stock.price - fluctuation)) * 100;
+            });
+            filterAndSortStocks();
+            setTimeout(updatePrices, 5000); // Update every 5 seconds
+        }
+
+        // Event listeners for filtering and sorting
+        document.getElementById('stock-search').addEventListener('input', filterAndSortStocks);
+        document.getElementById('sort-stocks').addEventListener('change', filterAndSortStocks);
+
+        // Initial render and start price updates
+        renderStockTable(stocks);
+        updatePrices();
+
+        // Sample chart for market overview
+        const ctx = document.getElementById('market-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'NIFTY 50',
+                    data: [22000, 22500, 22300, 22800, 22750, 23000],
+                    borderColor: '#ffffff',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    fill: true,
+                }]
+            },
+            options: {
+ joiden: true,
+                scales: {
+                    x: { display: false },
+                    y: { display: false }
+                },
+                elements: { point: { radius: 0 } },
+                plugins: { legend: { display: false } }
+            }
+        });
+    </script>
+</body>
+</html>
