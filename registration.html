@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeSmart AI - Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #e11d48;
+            --success: #22c55e;
+            --india-orange: #ff6200;
+            --india-green: #15803d;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            scroll-behavior: smooth;
+        }
+        .gradient-bg {
+            background: linear-gradient(-45deg, #1e3a8a, #3b82f6, #ec4899, #ef4444);
+            background-size: 400% 400%;
+            animation: gradient 12s ease infinite;
+        }
+        .india-gradient {
+            background: linear-gradient(-45deg, #ff6200, #ffffff, #15803d);
+            background-size: 400% 400%;
+            animation: gradient 12s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--secondary);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            color: white;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            transition: transform 0.3s ease;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .input-focus:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="Home.html" onclick="showPage('home-page')" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-red-600">TradeSmart AI</a>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="Home.html" onclick="showPage('home-page')" class="nav-link font-medium">Home</a>
+                <a href="Stocks.html" onclick="showPage('stocks-page')" class="nav-link font-medium">Stocks</a>
+                <a href="News.html" onclick="showPage('news-page')" class="nav-link font-medium">News</a>
+                <a href="Portfolio.html" onclick="showPage('portfolio-page')" class="nav-link font-medium">Portfolio</a>
+                <a href="Ipo.html" onclick="showPage('ipo-page')" class="nav-link font-medium">IPOs</a>
+                <a href="about_contact.html" onclick="showPage('about-page')" class="nav-link font-medium">About</a>
+            </div>
+            <div class="flex items-center">
+                <div id="guest-nav" class="flex md:flex space-x-4">
+                    <a href="login.html" onclick="showPage('login-page')" class="px-4 py-2 rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-50">Login</a>
+                    <a href="registration.html" onclick="showPage('signup-page')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Sign Up</a>
+                </div>
+                <div class="md:hidden ml-4">
+                    <button id="menu-toggle" class="focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section id="signup-page" class="gradient-bg min-h-screen flex items-center justify-center py-12">
+        <div class="container mx-auto px-6">
+            <div class="max-w-md mx-auto glass p-8 rounded-lg shadow-lg">
+                <h2 class="text-2xl md:text-3xl font-bold text-white text-center mb-6">Join TradeSmart AI</h2>
+                <p class="text-gray-200 text-center mb-8">Create your account to start predicting and managing your investments.</p>
+                <form id="register-form" class="space-y-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-200">Full Name</label>
+                        <input type="text" id="name" name="name" required class="mt-1 w-full px-4 py-2 bg-white bg-opacity-20 text-white placeholder-gray-400 border border-gray-300 rounded-lg input-focus" placeholder="Enter your name">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-200">Email Address</label>
+                        <input type="email" id="email" name="email" required class="mt-1 w-full px-4 py-2 bg-white bg-opacity-20 text-white placeholder-gray-400 border border-gray-300 rounded-lg input-focus" placeholder="Enter your email">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-200">Password</label>
+                        <input type="password" id="password" name="password" required minlength="8" class="mt-1 w-full px-4 py-2 bg-white bg-opacity-20 text-white placeholder-gray-400 border border-gray-300 rounded-lg input-focus" placeholder="Enter your password">
+                    </div>
+                    <div>
+                        <label for="confirm-password" class="block text-sm font-medium text-gray-200">Confirm Password</label>
+                        <input type="password" id="confirm-password" name="confirm-password" required minlength="8" class="mt-1 w-full px-4 py-2 bg-white bg-opacity-20 text-white placeholder-gray-400 border border-gray-300 rounded-lg input-focus" placeholder="Confirm your password">
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="terms" name="terms" required class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="terms" class="ml-2 block text-sm text-gray-200">I agree to the <a href="#" class="text-blue-400 hover:underline">Terms & Conditions</a></label>
+                    </div>
+                    <div>
+                        <button type="submit" class="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 hover-lift flex items-center justify-center">
+                            <i class="fas fa-user-plus mr-2"></i> Sign Up
+                        </button>
+                    </div>
+                </form>
+                <p class="mt-6 text-center text-sm text-gray-200">
+                    Already have an account? <a href="login.html" onclick="showPage('login-page')" class="text-blue-400 hover:underline">Login</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Placeholder for page navigation
+        function showPage(pageId) {
+            console.log(`Navigate to ${pageId}`);
+            // Implement page switching logic here
+        }
+
+        // Form validation and submission
+        document.getElementById('register-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const terms = document.getElementById('terms').checked;
+
+            // Basic validation
+            if (!name || name.length < 2) {
+                alert('Please enter a valid name (at least 2 characters).');
+                return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            if (password.length < 8) {
+                alert('Password must be at least 8 characters long.');
+                return;
+            }
+            if (password !== confirmPassword) {
+                alert('Passwords do not match.');
+                return;
+            }
+            if (!terms) {
+                alert('You must agree to the Terms & Conditions.');
+                return;
+            }
+
+            // Placeholder for form submission
+            console.log('Registration submitted:', { name, email, password });
+            alert('Registration successful! Redirecting to login...');
+            showPage('login-page');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeSmart AI - Charts</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .navbar {
+            background-color: #1a1a2e;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .navbar .logo {
+            color: #fff;
+            font-size: 28px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .navbar .nav-links a:hover {
+            color: #00ccff;
+        }
+        .navbar .auth-buttons a {
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 15px;
+            margin: 0 5px;
+            border: 1px solid #fff;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .navbar .auth-buttons a:hover {
+            background-color: #00ccff;
+            border-color: #00ccff;
+        }
+        .navbar .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .user-profile .notification {
+            background-color: #ff4d4d;
+            color: #fff;
+            border-radius: 50%;
+            padding: 5px 10px;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        .navbar .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .navbar .user-profile span {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 5%;
+        }
+        .section {
+            margin: 50px 0;
+        }
+        .section h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .chart-controls {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 20px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .chart-controls select, .chart-controls button {
+            padding: 8px 15px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .chart-controls select:hover, .chart-controls button:hover {
+            background-color: #00ccff;
+            color: #fff;
+            border-color: #00ccff;
+        }
+        .chart-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-card h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .chart-card .index-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .chart-card .index-info .live {
+            background-color: #28a745;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        .chart-card .index-info .value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+        .chart-card .index-info .change {
+            font-size: 16px;
+            color: #28a745;
+        }
+        .chart-card canvas {
+            max-width: 100%;
+        }
+        .insights {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .insights h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+        .insights p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #00ccff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background-color: #0099cc;
+        }
+        .btn.secondary {
+            background-color: #6c757d;
+        }
+        .btn.secondary:hover {
+            background-color: #5a6268;
+        }
+        .text-center {
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px;
+            }
+            .navbar .nav-links {
+                flex-direction: column;
+                margin: 10px 0;
+            }
+            .navbar .nav-links a {
+                margin: 5px 0;
+            }
+            .navbar .auth-buttons {
+                margin: 10px 0;
+            }
+            .container {
+                padding: 15px;
+            }
+            .section h2 {
+                font-size: 24px;
+            }
+            .chart-card h3 {
+                font-size: 18px;
+            }
+            .chart-controls {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="Home.html" class="logo">TradeSmart AI</a>
+        <div class="nav-links">
+            <a href="Home.html">Home</a>
+            <a href="Stocks.html">Stocks</a>
+            <a href="News.html">News</a>
+            <a href="Portfolio.html">Portfolio</a>
+            <a href="IPOs.html">IPOs</a>
+            <a href="About.html">About</a>
+        </div>
+        <div class="auth-buttons">
+            <a href="Login.html">Login</a>
+            <a href="SignUp.html">Sign Up</a>
+        </div>
+        <div class="user-profile">
+            <span>Amit Patel</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="section">
+            <h2>Market Performance & AI Predictions</h2>
+            <div class="chart-controls">
+                <select id="assetSelect" onchange="updateChart()">
+                    <option value="NIFTY 50">NIFTY 50</option>
+                    <option value="SENSEX">SENSEX</option>
+                    <option value="BANK NIFTY">BANK NIFTY</option>
+                    <option value="NIFTY IT">NIFTY IT</option>
+                    <option value="NIFTY MIDCAP">NIFTY MIDCAP</option>
+                    <option value="RELIANCE">Reliance Industries Ltd.</option>
+                    <option value="TCS">Tata Consultancy Services</option>
+                    <option value="INFY">Infosys Ltd.</option>
+                </select>
+                <select id="timeframe" onchange="updateChart()">
+                    <option value="1D">1 Day</option>
+                    <option value="1W">1 Week</option>
+                    <option value="1M">1 Month</option>
+                </select>
+                <button onclick="toggleIndicator('RSI')">Toggle RSI</button>
+                <button onclick="toggleIndicator('MACD')">Toggle MACD</button>
+            </div>
+            <div class="chart-card">
+                <h3 id="chartTitle">NIFTY 50 - National Stock Exchange</h3>
+                <div class="index-info">
+                    <span class="live">LIVE</span>
+                    <span class="value" id="chartValue">22,150.25</span>
+                    <span class="change" id="chartChange">+120.80 (+0.55%)</span>
+                </div>
+                <canvas id="mainChart"></canvas>
+                <div class="insights">
+                    <h4>AI Prediction Insights</h4>
+                    <p id="chartInsights">Our advanced LSTM model predicts a bullish trend for NIFTY 50 over the next 3 days, with a projected value of ~22,300 by May 17, 2025. The model’s confidence is 85%, driven by strong banking and IT sector momentum. RSI at 68 suggests nearing overbought conditions, advising caution for short-term traders.</p>
+                </div>
+            </div>
+            <div class="text-center">
+                <a href="Stocks.html" class="btn">Explore All Markets</a>
+                <a href="Portfolio.html" class="btn secondary">View Portfolio</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for line charts with AI predictions (replace with real API/model data)
+        const assetData = {
+            "NIFTY 50": {
+                labels: ['2025-05-01', '2025-05-02', '2025-05-03', '2025-05-04', '2025-05-05', '2025-05-06', '2025-05-07'],
+                futureLabels: ['2025-05-08', '2025-05-09', '2025-05-10'],
+                values: [22000, 22100, 22050, 22150, 22200, 22180, 22150.25],
+                predictedValues: [22180, 22250, 22300],
+                value: "22,150.25",
+                change: "+120.80 (+0.55%)",
+                insights: "Our advanced LSTM model predicts a bullish trend for NIFTY 50 over the next 3 days, with a projected value of ~22,300 by May 17, 2025. The model’s confidence is 85%, driven by strong banking and IT sector momentum. RSI at 68 suggests nearing overbought conditions, advising caution for short-term traders."
+            },
+            "SENSEX": {
+                labels: ['2025-05-01', '2025-05-02', '2025-05-03', '2025-05-04', '2025-05-05', '2025-05-06', '2025-05-07'],
+                futureLabels: ['2025-05-08', '2025-05-09', '2025-05-10'],
+                values: [72500, 72750, 72600, 72800, 73000, 72950, 73020.40],
+                predictedValues: [73050, 73200, 73350],
+                value: "73,020.40",
+                change: "+380.25 (+0.52%)",
+                insights: "The Prophet model forecasts steady growth for SENSEX, predicting a value of ~73,350 by May 17, 2025, with 82% confidence. Key support at 72,500 and positive corporate earnings sentiment drive the outlook."
+            },
+            "BANK NIFTY": {
+                labels: ['2025-05-01', '2025-05-02', '2025-05-03', '2025-05-04', '2025-05-05', '2025-05-06', '2025-05-07'],
+                futureLabels: ['2025-05-08', '2025-05-09', '2025-05-10'],
+                values: [47500, 47750, 47650, 47800, 48000, 47950, 48120.75],
+                predictedValues: [48150, 48250, 48400],
+                value: "48,120.75",
+                change: "+290.45 (+0.61%)",
+                insights: "BANK NIFTY shows strong momentum, with our LSTM model predicting a rise to ~48,400 by May 17, 2025 (87% confidence). MACD’s bullish crossover and positive financial sector news support the trend."
+            },
+            "NIFTY IT": {
+                labels: ['2025-05-01', '2025-05-02', '2025-05-03', '2025-05-04', '2025-05-05', '2025-05-06', '2025-05-07'],
+                futureLabels: ['2025-05-08', '2025-05-09', '2025-05-10'],
+                values: [34000, 34150, 34200, 34300, 34450, 34400, 34520.30],
+                predictedValues: [34550, 34600, 34650],
+                value: "34,520.30",
+                change: "+120.30 (+0.35%)",
+                insights: "NIFTY IT is set for steady growth, with the Prophet model predicting ~34,650 by May 17, 2025 (80% confidence). Strong IT earnings and global demand provide support at 34,000."
+            },
+            "NIFTY MIDCAP": {
+                labels: ['2025-05-01', '2025-05-02', '2025-05-03', '2025-05-04', '2025-05-05', '2025-05-06', '2025-05-07'],
+                futureLabels: ['2025-05-08', '2025-05-09', '2025-05-10'],
+                values: [10500, 10600, 10550, 10650, 10700, 10680, 10720.45],
+                predictedValues: [10750, 10800, 10850],
+                value: "10,720.45",
+                change: "+40.45 (+0.38%)",
+                insights: "NIFTY MIDCAP is poised for a breakout, with LSTM models predicting ~10,850 by May 17, 2025 (83% confidence). Growing investor interest in midcaps fuels the bullish outlook."
+            },
+            "RELIANCE": {
+                labels: ['2025-05-01', '2025-05-02', '2025-05-03', '2025-05-04', '2025-05-05', '2025-05-06', '2025-05-07'],
+                futureLabels: ['2025-05-08', '2025-05-09', '2025-05-10'],
+                values: [2900, 2920, 2910, 2930, 2940, 2945, 2950.20],
+                predictedValues: [2955, 2960, 2970],
+                value: "2,950.20",
+                change: "+30.75 (+1.05%)",
+                insights: "Reliance Industries is on a bullish trajectory, with LSTM models predicting ~2,970 by May 17, 2025 (88% confidence). Energy sector investments and positive news drive momentum."
+            },
+            "TCS": {
+                labels: ['2025-05-01', '2025-05-02', '2025-05-03', '2025-05-04', '2025-05-05', '2025-05-06', '2025-05-07'],
+                futureLabels: ['2025-05-08', '2025-05-09', '2025-05-10'],
+                values: [3700, 3720, 3710, 3730, 3740, 3735, 3740.50],
+                predictedValues: [3745, 3750, 3760],
+                value: "3,740.50",
+                change: "+50.30 (+1.36%)",
+                insights: "TCS shows robust growth, with LSTM models forecasting ~3,760 by May 17, 2025 (86% confidence). Strong IT sector earnings and optimism fuel the upward trend."
+            },
+            "INFY": {
+                labels: ['2025-05-01', '2025-05-02', '2025-05-03', '2025-05-04', '2025-05-05', '2025-05-06', '2025-05-07'],
+                futureLabels: ['2025-05-08', '2025-05-09', '2025-05-10'],
+                values: [1500, 1510, 1505, 1520, 1525, 1520, 1530.80],
+                predictedValues: [1535, 1540, 1545],
+                value: "1,530.80",
+                change: "+20.10 (+1.33%)",
+                insights: "Infosys is trending upward, with Prophet models predicting ~1,545 by May 17, 2025 (84% confidence). Global IT demand and positive sentiment strengthen the outlook."
+            }
+        };
+
+        let chartInstance = null;
+        let showRSI = false;
+        let showMACD = false;
+
+        function updateChart() {
+            const asset = document.getElementById('assetSelect').value;
+            const timeframe = document.getElementById('timeframe').value;
+
+            // Update chart metadata
+            document.getElementById('chartTitle').textContent = `${asset} - ${asset.includes('NIFTY') || asset === 'SENSEX' ? asset.includes('NIFTY') ? 'National Stock Exchange' : 'Bombay Stock Exchange' : 'Individual Stock'}`;
+            document.getElementById('chartValue').textContent = assetData[asset].value;
+            document.getElementById('chartChange').textContent = assetData[asset].change;
+            document.getElementById('chartInsights').textContent = assetData[asset].insights;
+
+            // Destroy existing chart
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            const datasets = [];
+
+            // Historical line chart
+            datasets.push({
+                label: `${asset} (Historical)`,
+                data: assetData[asset].values,
+                borderColor: '#00ccff',
+                backgroundColor: 'rgba(0, 204, 255, 0.1)',
+                fill: true,
+                tension: 0.3,
+                segment: {
+                    borderDash: ctx => ctx.p1DataIndex >= assetData[asset].values.length ? [5, 5] : undefined
+                }
+            });
+
+            // Predicted line chart (appended to historical)
+            datasets.push({
+                label: `${asset} (AI Predicted)`,
+                data: [...assetData[asset].values, ...assetData[asset].predictedValues],
+                borderColor: '#ff6600',
+                backgroundColor: 'rgba(255, 102, 0, 0.1)',
+                fill: true,
+                tension: 0.3,
+                borderDash: [5, 5],
+                showLine: true,
+                pointRadius: ctx => ctx.dataIndex < assetData[asset].values.length ? 0 : 3
+            });
+
+            // RSI Indicator
+            if (showRSI) {
+                const rsiValues = calculateRSI(assetData[asset].values);
+                datasets.push({
+                    label: 'RSI',
+                    data: rsiValues,
+                    borderColor: '#ffcc00',
+                    yAxisID: 'rsi',
+                    fill: false,
+                    tension: 0.3
+                });
+            }
+
+            // MACD Indicator
+            if (showMACD) {
+                const { macd, signal } = calculateMACD(assetData[asset].values);
+                datasets.push({
+                    label: 'MACD',
+                    data: macd,
+                    borderColor: '#ff6600',
+                    yAxisID: 'macd',
+                    fill: false,
+                    tension: 0.3
+                }, {
+                    label: 'Signal',
+                    data: signal,
+                    borderColor: '#0066cc',
+                    yAxisID: 'macd',
+                    fill: false,
+                    tension: 0.3
+                });
+            }
+
+            // Chart configuration
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [...assetData[asset].labels, ...assetData[asset].futureLabels],
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: { 
+                            title: { display: true, text: 'Date', color: '#333', font: { size: 14 } },
+                            grid: {
+                                color: ctx => ctx.tick.label.includes('2025-05-08') ? '#ff6600' : 'rgba(0, 0, 0, 0.1)',
+                                lineWidth: ctx => ctx.tick.label.includes('2025-05-08') ? 2 : 1
+                            }
+                        },
+                        y: { title: { display: true, text: 'Value', color: '#333', font: { size: 14 } } },
+                        rsi: {
+                            display: showRSI,
+                            position: 'right',
+                            min: 0,
+                            max: 100,
+                            title: { display: true, text: 'RSI', color: '#333', font: { size: 14 } },
+                            grid: { drawOnChartArea: false }
+                        },
+                        macd: {
+                            display: showMACD,
+                            position: 'right',
+                            title: { display: true, text: 'MACD', color: '#333', font: { size: 14 } },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function toggleIndicator(indicator) {
+            if (indicator === 'RSI') {
+                showRSI = !showRSI;
+            } else if (indicator === 'MACD') {
+                showMACD = !showMACD;
+            }
+            updateChart();
+        }
+
+        function calculateRSI(data, period = 14) {
+            const rsi = [];
+            for (let i = period; i < data.length; i++) {
+                let gain = 0, loss = 0;
+                for (let j = i - period + 1; j <= i; j++) {
+                    const change = data[j] - data[j - 1];
+                    if (change > 0) gain += change;
+                    else loss -= change;
+                }
+                const avgGain = gain / period;
+                const avgLoss = loss / period;
+                const rs = avgGain / avgLoss;
+                rsi.push(100 - (100 / (1 + rs)));
+            }
+            return Array(period - 1).fill(null).concat(rsi);
+        }
+
+        function calculateMACD(data, fast = 12, slow = 26, signal = 9) {
+            const ema = (data, period) => {
+                const k = 2 / (period + 1);
+                return data.reduce((acc, val, i) => {
+                    if (i === 0) return [val];
+                    return acc.concat([val * k + acc[acc.length - 1] * (1 - k)]);
+                }, []);
+            };
+            const fastEMA = ema(data, fast);
+            const slowEMA = ema(data, slow);
+            const macd = fastEMA.map((f, i) => i >= slow - 1 ? f - slowEMA[i] : null).slice(slow - 1);
+            const signalLine = ema(macd, signal);
+            return {
+                macd: Array(slow - 1).fill(null).concat(macd),
+                signal: Array(slow - 1 + signal - 1).fill(null).concat(signalLine)
+            };
+        }
+
+        // Initial chart render
+        updateChart();
+    </script>
+</body>
+</html>
